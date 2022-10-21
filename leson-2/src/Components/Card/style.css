@@ -1,0 +1,65 @@
+html{
+  background-color: darkmagenta
+}
+
+.img {
+  width: 200px;
+  border: 1px solid black;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 5px
+}
+h1{
+  font-size:20px;
+  font-weight: 700;
+  padding: 20px;
+  padding-left: 70px;
+  color:white
+  
+}
+.title {
+  font-size: 20px;
+  font-weight: bold;
+  color:white
+}
+
+.description {
+  font-size: 10px;
+  font-style: italic;
+  font-weight: 400;
+  color:lightslategray
+}
+
+.daily_title {
+  display: grid;
+  width: auto;
+  height: 100px;
+  margin:80px;
+  grid-template-columns: 20% 20% 20% 20% 20%;
+}
+
+.new_songs {
+  display: grid;
+  width: auto;
+  height: auto;
+  margin:80px;
+  grid-template-columns: 33% 33% 33%;
+  grid-template-rows: 25% 25% 25% 25%;
+}
+
+.grid_item {
+  width: auto;
+  height: auto;
+  border: 5px;
+}
+
+.song_title{
+  font-size: 14px;
+  font-family: Inter,sans-serif;
+  font-weight: bold;
+  color:white
+}
+.composer, .time{
+  font-size: 10px;
+  color:lightslategray
+}

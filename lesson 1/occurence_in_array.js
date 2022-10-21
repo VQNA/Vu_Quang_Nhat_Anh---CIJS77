@@ -15,6 +15,7 @@ occurences = (string) => {
         }
         else { }
     }
+    console.log('different number:', element.length)
 }
 
 
