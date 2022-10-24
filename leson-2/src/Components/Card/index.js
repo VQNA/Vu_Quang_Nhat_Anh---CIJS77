@@ -11,4 +11,22 @@ function NameCard(props) {
 }
 
 
+
 export default NameCard
+
+// export default function Components(props){
+//   cons[visibility, setVisibility] = useState("hidden");
+//   cons[opacity, setOpacity] = useState(1);
+//   return(
+
+//     <Col
+//     xxl = {4}
+//     classname = {style['']}
+//     onMouseEnter = {() => {
+//       setVisibility("unset")
+//       setOpacity('0.4')
+//     }}
+
+//     )
+//   )
+// }
