@@ -2,12 +2,12 @@ import React, {useState} from "react";
 
 const FunctionalComponent=()=>{
     
-    const[student, setStudent] = useState({
+    const[student, setStudent] = useState({ //student
         name: "123",
         age: 10
       });
       
-      const[counter, setcounter] = useState(0);
+      const[counter, setcounter] = useState(0); //counter
     
     return(<div>
         <div>Counter: {student.age}</div>
