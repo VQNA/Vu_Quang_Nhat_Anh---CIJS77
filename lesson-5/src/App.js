@@ -54,9 +54,11 @@ class RegisterPage extends React.Component {
     };
     if (nameInput == "passwordConfirm" && this.state.password != value) {
       errorMessage["passwordConfirmM"] = "Password ko giong nhau";
-    } else if (nameInput == "username" && users_list.some(function(el){ return el.username == value})) {
-      errorMessage["fullnameM"] =
-        "Ten tai khoan da duoc nguoi khac su dung";
+    // } else if (nameInput == "username" && users_list.some(function(el){ return el.username == value})) {
+    } else if (nameInput == "username") {
+      checkusernameexist(value) 
+    // errorMessage["fullnameM"] =
+    //     "Ten tai khoan da duoc nguoi khac su dung";
     } else if (
       (nameInput == "fullname" && special_character.test(value) == true) ||
       (nameInput == "fullname" && hasNumber.test(value) == true)
@@ -85,6 +87,30 @@ class RegisterPage extends React.Component {
     });
   };
 
+  checkusernameexist() {
+    fetch(`https://635d3172cb6cf98e56af26be.mockapi.io/api/v1/users/users?username=${value}`,
+    {
+      method: "GET" }).then((response) => response.json()).then((users) => {
+        if (users.filter((user) =>
+        user.username == valueInput 
+      ).length > 0) {
+        this.setState({
+          ...this.state,
+          errorMessage:{
+            ...this.state.errorMessage,
+            usernameM: "da co nguoi su dung username",
+          },
+        })
+      } else{
+        this.setState({
+          ...this.state,
+          errorMessage:{
+            ...this.state.errorMessage,
+            usernameM: "",
+          },
+        })
+      }})
+    }
   handleSubmitForm = (e) => {
     e.preventDefault();
     const { errorMessage, fullname, password, username } = this.state;
@@ -93,6 +119,9 @@ class RegisterPage extends React.Component {
     }
     fetch("https://635d3172cb6cf98e56af26be.mockapi.io/api/v1/users/users", {
       method: "POST",
+      headers:{
+        "Content-type": "application/JSON"
+      },
       body: JSON.stringify({
         user: {
           name: fullname,
@@ -101,7 +130,7 @@ class RegisterPage extends React.Component {
         },
       }),
     });
-  };
+  }
 
   render() {
     const { errorMessage } = this.state;
@@ -176,4 +205,4 @@ class RegisterPage extends React.Component {
       </div>
     );
   }
-}
+  }
