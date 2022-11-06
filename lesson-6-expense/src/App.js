@@ -51,6 +51,7 @@ class ExpenseApp extends React.Component {
       ...this.state,
       [nameInput]: value
     });
+    console.log(this.state)
   }
 
   handleSubmit = (e) => {
@@ -58,7 +59,7 @@ class ExpenseApp extends React.Component {
     this.setState({
       ...this.state,
       bill: [...this.state.bill,
-      {
+      { id: this.state.bill.length + 1,
         date: this.state.inputValueDate,
         description: this.state.inputValueName,
         amount: this.state.inputValueAmount
