@@ -35,7 +35,7 @@ class ExpenseApp extends React.Component {
           amount: "100"
         }],
       year: "",
-      AdditionalId:"",
+      AdditionalId: "",
       inputValueName: "",
       inputValueAmount: "",
       inputValueDate: ""
@@ -47,29 +47,29 @@ class ExpenseApp extends React.Component {
   }
 
   onChangeInput = (nameInput, value) => {
-    let new_id = this.state.bill.length()
     this.setState({
       ...this.state,
-      AdditionalId: new_id,
-      [nameInput]:value
+      [nameInput]: value
     });
-
   }
 
-  handleSubmit = (e) =>{
-      this.setState({
-        ...this.state,
-        bill: [...this.state.bill,
-          {
-          id: this.state.AdditionalId,
-          date: this.state.inputValueDate,
-          description: this.state.inputValueName,
-          amount: this.state.inputValueAmount
-        }
-        ]
-      })
-    }
-  
+  handleSubmit = (e) => {
+    e.preventDefault()
+    this.setState({
+      ...this.state,
+      bill: [...this.state.bill,
+      {
+        date: this.state.inputValueDate,
+        description: this.state.inputValueName,
+        amount: this.state.inputValueAmount
+      }
+      ],
+      inputValueName: "",
+      inputValueAmount: "",
+      inputValueDate: ""
+    })
+  }
+
   render() {
     let { Open } = this.state;
 
@@ -83,85 +83,89 @@ class ExpenseApp extends React.Component {
 
     return (
       <div className="Form">
+        <div className="Form_Add">
+          {Open ? (
+            <div className='container'>
+              <form onSubmit={this.handleSubmit}>
+                <div>
+                  <label>Name</label>
+                  <input
+                    className='input_field'
+                    type="text"
+                    name="description"
+                    placeholder='Enter name here...'
+                    onChange={(e) => {
+                      this.onChangeInput("inputValueName", e.target.value);
+                    }}
+                  />
+                </div>
+                <div>
+                  <label>Amount</label>
+                  <input
+                    className='input_field'
 
-        {Open ? (
-          <div className='container'>
-            <form onSubmit={this.handleSubmit}>
-            <div>
-              <label>Name</label>
-              <input
-                type="text"
-                name="description"
-                placeholder='Enter name here...'
-                onChange={(e) => {
-                  this.onChangeInput("inputValueName", e.target.value);
-                }}
-              />
-            </div>
-            <div>
-              <label>Amount</label>
-              <input
-                type="text"
-                name="amount"
-                placeholder='Enter amount here...'
-                onChange={(e) => {
-                  this.onChangeInput("inputValueAmount", e.target.value);
-                }}
+                    type="text"
+                    name="amount"
+                    placeholder='Enter amount here...'
+                    onChange={(e) => {
+                      this.onChangeInput("inputValueAmount", e.target.value);
+                    }}
 
-              />
-            </div>
-            <div>
-              <label>Date</label>
-              <input
-                type="text"
-                name="date"
-                placeholder='dd/mm/yy'
-                onChange={(e) => {
-                  this.onChangeInput("inputValueDate", e.target.value);
-                }}
-              />
-            </div>
-            <button type="submit">Add</button>
-            </form>
-            <button onClick={() => {
-              this.setState({
-                Open: !Open
+                  />
+                </div>
+                <div>
+                  <label>Date</label>
+                  <input
+                    className='input_field'
 
-              })
-            }}>Cancel</button>
+                    type="text"
+                    name="date"
+                    placeholder='dd/mm/yy'
+                    onChange={(e) => {
+                      this.onChangeInput("inputValueDate", e.target.value);
+                    }}
+                  />
+                </div>
+                <button className='add_expense' type="submit">Add</button>
+              </form>
+              <button className='cancel' onClick={() => {
+                this.setState({
+                  Open: !Open
 
-          </div>) : (<div>
-            <button onClick={() => {
-              this.setState({
-                Open: !Open
+                })
+              }}>Cancel</button>
 
-              })
-            }}>Add new expense</button>
-          </div>)}
+            </div>) : (<div>
+              <button className='open' onClick={() => {
+                this.setState({
+                  Open: !Open
 
+                })
+              }}>Add new expense</button>
+            </div>)}
+        </div>
 
         <div className='display_form'>
-          <div>
-            <label for="year_select">Filter by year: </label>
-            <select name="year_select" value={this.state.year} onChange={this.handleFilterYear}>
+          <div className='Filter'>
+            <label for="year_select" className='Title_filter'>Filter by year: </label>
+            <select name="year_select" className='Selector' value={this.state.year} onChange={this.handleFilterYear}>
               <option value={null}>{null}</option>
               <option value="2021">2021</option>
               <option value="2022">2022</option>
               <option value="2023">2023</option>
               <option value="2024">2024</option>
             </select>
-
-            {filterDropdown.map((bills) => {
-              return (
-                <div key={bills.id}>
-                  <div>{bills.date}</div>
-                  <div>{bills.description}</div>
-                  <div>${bills.amount}</div>
-
-                </div>
-              )
-            })}
           </div>
+          {filterDropdown.map((bills) => {
+            return (
+              <div key={bills.id} className="ExpenseItem">
+                <div className="Date">{bills.date}</div>
+                <div className="Desc">{bills.description}</div>
+                <div className="Amount">${bills.amount}</div>
+
+              </div>
+            )
+          })}
 
 
         </div>
