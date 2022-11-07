@@ -13,8 +13,8 @@ function App() {
     <Router>
       <Switch>
         <Route exact path="/">
-          {/* <HomePage /> */}
-          <HomePageHook />
+          <HomePage />
+          {/* <HomePageHook /> */}
         </Route>
         <Route exact path="/register"  >
           <RegisterPage />
@@ -48,7 +48,6 @@ class HomePage extends React.Component {
 
   }
   handleSubmitForm = (e) => {
-    
     e.preventDefault();
     const { image, description} = this.state
     fetch("https://635d3184cb6cf98e56af2894.mockapi.io/api/v1/users/1/photos?", {
@@ -65,7 +64,6 @@ class HomePage extends React.Component {
     }).catch((err) => {
 
     });
-    console.log("mate")
   }
   componentWillMount() {
     console.log("componentWillMount");
@@ -123,7 +121,7 @@ class HomePage extends React.Component {
         />
       </div>
       </form>
-      <button type="submit" onclick={() =>{console.log("run")}}/>
+      <button type="submit" onClick={this.handleSubmitForm}/>
       </div>
       <div>
         <div>{this.state.counter}</div>
