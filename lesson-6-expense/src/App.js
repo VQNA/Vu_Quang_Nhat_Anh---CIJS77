@@ -45,13 +45,14 @@ class ExpenseApp extends React.Component {
   handleFilterYear = (e) => {
     this.setState({ year: e.target.value })
   }
-
+  handleDelete = (e) => {
+    console.log(e.target.value)
+  }
   onChangeInput = (nameInput, value) => {
     this.setState({
       ...this.state,
       [nameInput]: value
     });
-    console.log(this.state)
   }
 
   handleSubmit = (e) => {
@@ -163,6 +164,7 @@ class ExpenseApp extends React.Component {
                 <div className="Date">{bills.date}</div>
                 <div className="Desc">{bills.description}</div>
                 <div className="Amount">${bills.amount}</div>
+                <button className = "Delete" onClick={this.handleDelete}>Delete</button>
 
               </div>
             )

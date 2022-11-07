@@ -5,30 +5,31 @@ import {
   Switch,
   Route,
   Link,
-  useRouteMatch,
-  useParams
+  withRouter,
+  useHistory
 } from "react-router-dom";
 
-export default funtion App(){
-  return {
+export default function App(){
+  return (
     <Router>
-    <Switch>
-    <Route path="/about">
-      <About />
-    </Route>
-    <Route path="/topics">
-      <Topics />
-    </Route>
-    <Route path="/">
-      <Home />
-    </Route>
-  </Switch>
-</Router>
-  }
+      <Switch>
+        <Route exact path="/">
+          <HomePage />
+          {/* HomePageHook /> */}
+        </Route>
+        <Route exact path="/register">
+          <RegisterPage />
+        </Route>
+        <Route exact path="/login">
+          <LoginPage />
+        </Route>
+      </Switch>
+    </Router>
+  )
 }
 
 
-class homepage extends React.Component {
+class HomePage extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
