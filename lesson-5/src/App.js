@@ -21,20 +21,20 @@ function App() {
 
   return (
     <UserContext.Provider value={{ userId: JSON.parse(userId) }}>
-    <PhotoContext.Provider value={{ photoId: JSON.parse(photoId) }}>
-      <Router>
-        <Switch>
-          <Route exact path="/register"  >
-            <RegisterPage />
-          </Route>
-          <Route exact path="/login" >
-            <LoginPage />
-          </Route>
-          <PrivateRoute exact component={HomePageHook} path="/" />
-          <PrivateRoute exact component={AddPhotoPage} path="/add-photos" />
-          <PrivateRoute exact component={Photo_description} path="/photo-edit" />
-        </Switch>
-      </Router>
+      <PhotoContext.Provider value={{ photoId: JSON.parse(photoId) }}>
+        <Router>
+          <Switch>
+            <Route exact path="/register"  >
+              <RegisterPage />
+            </Route>
+            <Route exact path="/login" >
+              <LoginPage />
+            </Route>
+            <PrivateRoute exact component={HomePageHook} path="/" />
+            <PrivateRoute exact component={AddPhotoPage} path="/add-photos" />
+            <PrivateRoute exact component={Photo_description} path="/photo-edit" />
+          </Switch>
+        </Router>
       </PhotoContext.Provider>
     </UserContext.Provider>
   );
@@ -150,7 +150,7 @@ function HomePageHook() {
       {
         listImage.map((value, index) => <div key={index}>
           <img src={value.image} alt={value.description} onClick={() => {
-          // eslint-disable-next-line no-restricted-globals
+            // eslint-disable-next-line no-restricted-globals
             history.push(`/photo-edit`)
 
             localStorage.setItem("photoId", JSON.stringify(index));
@@ -285,7 +285,7 @@ class RegisterPage extends React.Component {
   render() {
     const { errorMessage } = this.state;
     return (
-      <div class="container">
+      <div className="container">
         <h1>Register</h1>
         <form onSubmit={this.handleSubmitForm}>
           <div>
@@ -329,22 +329,22 @@ class RegisterPage extends React.Component {
               }}
             />
             {errorMessage.fullnameM != "" ? (
-              <div class="errorMsg">{errorMessage.fullnameM}</div>
+              <div className="errorMsg">{errorMessage.fullnameM}</div>
             ) : (
               <></>
             )}
             {errorMessage.usernameM != "" ? (
-              <div class="errorMsg">{errorMessage.usernameM}</div>
+              <div className="errorMsg">{errorMessage.usernameM}</div>
             ) : (
               <></>
             )}
             {errorMessage.passwordM != "" ? (
-              <div class="errorMsg">{errorMessage.passwordM}</div>
+              <div className="errorMsg">{errorMessage.passwordM}</div>
             ) : (
               <></>
             )}
             {errorMessage.passwordConfirmM != "" ? (
-              <div class="errorMsg">{errorMessage.passwordConfirmM}</div>
+              <div className="errorMsg">{errorMessage.passwordConfirmM}</div>
             ) : (
               <></>
             )}
@@ -490,7 +490,7 @@ function AddPhotoPage() {
 
   const handleSubmitForm = (e) => {
     e.preventDefault();
-    fetch(`https://635d3184cb6cf98e56af2894.mockapi.io/api/v1/users/${userContext.userId}/photos`, {
+    fetch(`https://635d3184cb6cf98e56af2894.mockapi.io/api/v1/users/${userContext.userId}/photos/`, {
       method: "POST",
       body: JSON.stringify({
         userId: userContext.userId,
@@ -524,7 +524,7 @@ function AddPhotoPage() {
         onChangeInput("description", e.target.value);
       }} />
       {input.image != "" ? (
-        <img class="img" src={input.image} alt={input.description}></img>
+        <img className="img" src={input.image} alt={input.description}></img>
       ) : (
         <></>
       )}
@@ -537,30 +537,47 @@ function AddPhotoPage() {
 function Photo_description() {
   let userContext = useContext(UserContext);
   let history = useHistory();
-  let [input, setInput] = useState({
-    
-    image: "",
-    description: "",
-  });
+  let [listImage, setListImage] = useState([])
+  let photoId = localStorage.getItem("photoId")
+  console.log(`https://635d3184cb6cf98e56af2894.mockapi.io/api/v1/users/${userContext.userId}/photos/${photoId}`)
+
+  useEffect(() => {
+    getListPhotos();
+  }, [])
+
+  function getListPhotos() {
+    fetch(`https://635d3184cb6cf98e56af2894.mockapi.io/api/v1/users/${userContext.userId}/photos`, {
+      method: "GET"
+    }).then((response) => response.json()).then((res) => {
+      setListImage([...res.items]);
+    }).catch((err) => console.log(err))
+  }
+
+
+
+
+
+
 
   const onChangeInput = (nameInput, value) => {
-    setInput({
-      ...input,
+    setListImage({
+      ...listImage,
       [nameInput]: value
     })
     console.log(value)
   };
-  
-  
+
+
   const handleSubmitForm = (e) => {
     e.preventDefault();
-    fetch(`https://635d3184cb6cf98e56af2894.mockapi.io/api/v1/users/${userContext.userId}/photos/${userContext.userId}`, {
+    
+    fetch(`https://635d3184cb6cf98e56af2894.mockapi.io/api/v1/users/${userContext.userId}/photos/${photoId}`, {
       method: "POST",
       body: JSON.stringify({
-        id: userContext.photoId,
+        id: PhotoContext.photoId,
         userId: userContext.userId,
-        image: input.image,
-        description: input.description
+        image: listImage.image,
+        description: listImage.description
       }),
       headers: {
         'Content-Type': 'application/json'
@@ -568,7 +585,7 @@ function Photo_description() {
     }).then((res) => {
       console.log(".")
       if (res.status == 201) {
-        setInput({
+        setListImage({
           image: "",
           description: "",
         })
@@ -576,26 +593,23 @@ function Photo_description() {
       }
     })
   };
-  
   return <form onSubmit={handleSubmitForm}>
     <div>
       <label>Image</label>
-      <input type="text" name="image" defaultValue = {input.image} onChange={(e) => {
+      <input type="text" name="image" defaultValue={listImage.image} onChange={(e) => {
         onChangeInput("image", e.target.value);
       }}></input>
     </div>
     <div>
       <label>Description</label>
+      <h1></h1>
       <textarea type="description" name="description" onChange={(e) => {
         onChangeInput("description", e.target.value);
-      }}>{input.description}</textarea>
-      {input.image != "" ? (
-        <img class="img" src={input.image} alt={input.description}></img>
-      ) : (
-        <></>
-      )}
+      }}>{listImage.description}</textarea>
+      <img className="img" src={listImage.image} alt={listImage.description} />
+
 
     </div>
     <button>Edit photo</button>
-    </form>
+  </form>
 }
