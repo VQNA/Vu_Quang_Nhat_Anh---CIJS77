@@ -6,24 +6,37 @@ import {
   Switch,
   Route,
   withRouter,
-  useHistory
+  useHistory,
+  Redirect
 } from "react-router-dom";
+import { useContext } from 'react';
+let UserContext = React.createContext();
+let PhotoContext = React.createContext();
+
+
+
 function App() {
+  let userId = localStorage.getItem("userId");
+  let photoId = localStorage.getItem("photoId")
+
   return (
-    <Router>
-      <Switch>
-        <Route exact path="/">
-          <HomePage />
-          {/* <HomePageHook /> */}
-        </Route>
-        <Route exact path="/register"  >
-          <RegisterPage />
-        </Route>
-        <Route exact path="/login" >
-          <LoginPage />
-        </Route>
-      </Switch>
-    </Router>
+    <UserContext.Provider value={{ userId: JSON.parse(userId) }}>
+    <PhotoContext.Provider value={{ photoId: JSON.parse(photoId) }}>
+      <Router>
+        <Switch>
+          <Route exact path="/register"  >
+            <RegisterPage />
+          </Route>
+          <Route exact path="/login" >
+            <LoginPage />
+          </Route>
+          <PrivateRoute exact component={HomePageHook} path="/" />
+          <PrivateRoute exact component={AddPhotoPage} path="/add-photos" />
+          <PrivateRoute exact component={Photo_description} path="/photo-edit" />
+        </Switch>
+      </Router>
+      </PhotoContext.Provider>
+    </UserContext.Provider>
   );
 }
 
@@ -36,35 +49,10 @@ class HomePage extends React.Component {
     super(props)
     this.state = {
       image: "",
-      description:""
+      description: ""
     }
   }
-  onChangeInput = (nameInput, value) => {
-    this.setState({
-      ...this.state,
-      [nameInput]: value,
-    });
 
-
-  }
-  handleSubmitForm = (e) => {
-    e.preventDefault();
-    const { image, description} = this.state
-    fetch("https://635d3184cb6cf98e56af2894.mockapi.io/api/v1/users/1/photos?", {
-      method: 'POST', // *GET, POST, PUT, DELETE, etc.
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        image: image,
-        description: description,
-      })
-    }).then(() => {
-      const { match, location, history } = this.props;
-    }).catch((err) => {
-
-    });
-  }
   componentWillMount() {
     console.log("componentWillMount");
   }
@@ -94,35 +82,8 @@ class HomePage extends React.Component {
   }
 
   render() {
-    console.log("render");
     return <>
       <h1>HomePage</h1>
-      <div>
-      <h2>Image submit</h2>
-      <form onSubmit={this.handleSubmitForm}>
-      <div>
-        <label>Avatar Picture</label>
-        <input
-          type="text"
-          name="username"
-          onChange={(e) => {
-            this.onChangeInput("image", e.target.value);
-          }}
-        />
-      </div>
-      <div>
-        <label>Description</label>
-        <input
-          type="text"
-          name="username"
-          onChange={(e) => {
-            this.onChangeInput("description", e.target.value);
-          }}
-        />
-      </div>
-      </form>
-      <button type="submit" onClick={this.handleSubmitForm}/>
-      </div>
       <div>
         <div>{this.state.counter}</div>
         <button onClick={() => {
@@ -143,7 +104,6 @@ class HomePage extends React.Component {
 HomePage = withRouter(HomePage);
 
 function HomePageHook() {
-  let history = useHistory();
   let [listImage, setListImage] = useState([]);
   let [page, setPage] = useState(1);
   let [limit, setLimit] = useState(10);
@@ -189,12 +149,21 @@ function HomePageHook() {
     <div>
       {
         listImage.map((value, index) => <div key={index}>
-          <img src={value.image} alt={value.description} />
+          <img src={value.image} alt={value.description} onClick={() => {
+          // eslint-disable-next-line no-restricted-globals
+            history.push(`/photo-edit`)
+
+            localStorage.setItem("photoId", JSON.stringify(index));
+          }} />
         </div>)
       }
     </div>
   </>
 }
+
+
+
+
 
 class RegisterPage extends React.Component {
   constructor(props) {
@@ -400,7 +369,12 @@ class LoginPage extends React.Component {
     }
   }
 
-
+  onChangeInput = (nameInput, value) => {
+    this.setState({
+      ...this.state,
+      [nameInput]: value,
+    })
+  }
   checkUsernameExist(valueInput) {
     fetch(`https://635d3172cb6cf98e56af26be.mockapi.io/api/v1/users/users?username=${valueInput}`, {
       method: "GET"
@@ -430,7 +404,32 @@ class LoginPage extends React.Component {
   }
 
   handleSubmitForm = (e) => {
-
+    e.preventDefault();
+    fetch(`https://635d3184cb6cf98e56af2894.mockapi.io/api/v1/users?username=${this.state.username}`, {
+      method: "GET"
+    }).then((response) => response.json()).then((users) => {
+      let userFound = users.find((user) =>
+        user.username === this.state.username
+      )
+      let message = ''
+      if (userFound != null) {
+        if (this.state.username == userFound.username && userFound.password === this.state.password) {
+          localStorage.setItem("userId", JSON.stringify(userFound.id));
+          this.props.history.push("/");
+        } else {
+          message = "Sai username hoac password"
+        }
+      } else {
+        message = "Sai username hoac password"
+      }
+      this.setState({
+        ...this.state,
+        password: "",
+        errorMessage: message
+      })
+    }).catch((error) => {
+      console.log(error);
+    });
   }
 
   render() {
@@ -457,4 +456,146 @@ class LoginPage extends React.Component {
       </form>
     </>
   }
+}
+
+LoginPage = withRouter(LoginPage);
+
+
+function PrivateRoute({ component: Component, path, ...rest }) {
+  let userId = localStorage.getItem("userId");
+  return <Route {...rest}
+    render={(props) => {
+      return userId != null && userId != "" ? <Component {...props} /> : <Redirect to={{
+        pathname: "/login"
+      }} />
+    }}>
+  </Route>
+}
+
+function AddPhotoPage() {
+  let userContext = useContext(UserContext);
+  let history = useHistory();
+  let [input, setInput] = useState({
+    image: "",
+    description: "",
+  })
+
+  const onChangeInput = (nameInput, value) => {
+    setInput({
+      ...input,
+      [nameInput]: value
+    })
+    console.log(value)
+  }
+
+  const handleSubmitForm = (e) => {
+    e.preventDefault();
+    fetch(`https://635d3184cb6cf98e56af2894.mockapi.io/api/v1/users/${userContext.userId}/photos`, {
+      method: "POST",
+      body: JSON.stringify({
+        userId: userContext.userId,
+        image: input.image,
+        description: input.description
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    }).then((res) => {
+      if (res.status == 201) {
+        setInput({
+          image: "",
+          description: "",
+        })
+        history.push("/");
+      }
+    })
+  }
+
+  return <form onSubmit={handleSubmitForm}>
+    <div>
+      <label>Image</label>
+      <input type="text" name="image" onChange={(e) => {
+        onChangeInput("image", e.target.value);
+      }} />
+    </div>
+    <div>
+      <label>Description</label>
+      <textarea type="description" name="description" onChange={(e) => {
+        onChangeInput("description", e.target.value);
+      }} />
+      {input.image != "" ? (
+        <img class="img" src={input.image} alt={input.description}></img>
+      ) : (
+        <></>
+      )}
+
+    </div>
+    <button>Them photo</button>
+  </form>
+}
+
+function Photo_description() {
+  let userContext = useContext(UserContext);
+  let history = useHistory();
+  let [input, setInput] = useState({
+    
+    image: "",
+    description: "",
+  });
+
+  const onChangeInput = (nameInput, value) => {
+    setInput({
+      ...input,
+      [nameInput]: value
+    })
+    console.log(value)
+  };
+  
+  
+  const handleSubmitForm = (e) => {
+    e.preventDefault();
+    fetch(`https://635d3184cb6cf98e56af2894.mockapi.io/api/v1/users/${userContext.userId}/photos/${userContext.userId}`, {
+      method: "POST",
+      body: JSON.stringify({
+        id: userContext.photoId,
+        userId: userContext.userId,
+        image: input.image,
+        description: input.description
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    }).then((res) => {
+      console.log(".")
+      if (res.status == 201) {
+        setInput({
+          image: "",
+          description: "",
+        })
+        history.push("/");
+      }
+    })
+  };
+  
+  return <form onSubmit={handleSubmitForm}>
+    <div>
+      <label>Image</label>
+      <input type="text" name="image" defaultValue = {input.image} onChange={(e) => {
+        onChangeInput("image", e.target.value);
+      }}></input>
+    </div>
+    <div>
+      <label>Description</label>
+      <textarea type="description" name="description" onChange={(e) => {
+        onChangeInput("description", e.target.value);
+      }}>{input.description}</textarea>
+      {input.image != "" ? (
+        <img class="img" src={input.image} alt={input.description}></img>
+      ) : (
+        <></>
+      )}
+
+    </div>
+    <button>Edit photo</button>
+    </form>
 }
