@@ -1,7 +1,7 @@
     // Todo.js
     
     import React, { useState, useEffect } from 'react';
-    import "./todo.css";
+    import "./active.css";
 
     
     function Active() {
@@ -62,7 +62,6 @@
         
         return (
           <div className="app">
-            <h1>My Todo List</h1>
       
             <input
               type="text"
@@ -72,12 +71,12 @@
             />
       
             <button onClick={() => addItem()}>Add</button>
-      
+            
             <ul>
               {items.map((item) => {
                 return (
                 
-                  <div className={item.status ? 'ongoing' : 'done'}>
+                  <div className={item.status ? 'ongoingA' : 'doneA'}>
                     <li key={item.id}>
                       {item.value}
                       <button

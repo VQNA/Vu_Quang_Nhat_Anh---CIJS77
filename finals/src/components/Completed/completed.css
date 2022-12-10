@@ -3,10 +3,10 @@ body {
   }
   
  
-  .done {
-    text-decoration: line-through;
-    opacity: 0.3;
+  .ongoingC {
+    display: none;
   }
+  
   
   ul {
     list-style-type: none;

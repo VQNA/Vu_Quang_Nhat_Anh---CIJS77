@@ -59,7 +59,6 @@ function ToDo() {
   
   return (
     <div className="app">
-      <h1>My Todo List</h1>
 
       <input
         type="text"

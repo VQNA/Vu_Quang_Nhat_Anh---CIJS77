@@ -7,6 +7,7 @@ const HandleActiveClass = (params) => {
 const Header = () => {
     return(
         <div className='header'>
+            <h1>#todo</h1>
             <ul>
                 <li>
                     <NavLink to="/" className={HandleActiveClass}>All</NavLink>
