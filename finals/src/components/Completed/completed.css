@@ -6,7 +6,9 @@ body {
   .ongoingC {
     display: none;
   }
-  
+  .doneC {
+    text-decoration: line-through;
+  }
   
   ul {
     list-style-type: none;
